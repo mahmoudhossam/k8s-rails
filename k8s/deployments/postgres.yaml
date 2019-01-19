@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: drkiq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drkiq
+      component: postgres
+  template:
+    metadata:
+      labels:
+        app: drkiq
+        component: postgres
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: postgres
+      containers:
+      - name: name
+        image: postgres:11-alpine
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        env:
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: postgres
+                key: username
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres
+                key: password
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+          - mountPath: "/var/lib/postgresql/data"
+            name: data

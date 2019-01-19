@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: drkiq
+  namespace: drkiq
+spec:
+  selector:
+    app: drkiq
+    component: rails
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000

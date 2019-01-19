@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dbinit
+  namespace: drkiq
+  labels:
+    app: drkiq
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      name: dbinit
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: drkiq
+        image: mahmoudhossam/drkiq:v1
+        imagePullPolicy: IfNotPresent
+        command: ["rake", "db:reset", "&&", "rake", "db:migrate"]
+        env:
+          - name: WORKER_PROCESSES
+            valueFrom:
+              configMapKeyRef:
+                name: drkiq
+                key: worker-processes
+          - name: LISTEN_ON
+            valueFrom:
+              configMapKeyRef:
+                name: drkiq
+                key: listen-on
+          - name: CACHE_URL
+            valueFrom:
+              configMapKeyRef:
+                name: drkiq
+                key: redis-url
+          - name: JOB_WORKER_URL
+            valueFrom:
+              configMapKeyRef:
+                name: drkiq
+                key: redis-url
+          - name: SECRET_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: secret-token
+                key: token
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: database-url
+                key: url

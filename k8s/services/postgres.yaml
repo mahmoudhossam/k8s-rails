@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: drkiq
+  labels:
+    app: drkiq
+    component: postgres
+spec:
+  ports:
+  - port: 5432
+  selector:
+    app: drkiq
+    component: postgres

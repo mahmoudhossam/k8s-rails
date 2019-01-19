@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sidekiq
+  namespace: drkiq
+  labels:
+    app: drkiq
+    component: sidekiq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drkiq
+      component: sidekiq
+  template:
+    metadata:
+      labels:
+        app: drkiq
+        component: sidekiq
+    spec:
+      containers:
+      - name: sidekiq
+        image: mahmoudhossam/drkiq:v1
+        command: ["bundle"]
+        args: ["exec", "sidekiq", "-C", "config/sidekiq.yml"]
+        env:
+          - name: WORKER_PROCESSES
+            valueFrom:
+              configMapKeyRef:
+                name: drkiq
+                key: worker-processes
+          - name: LISTEN_ON
+            valueFrom:
+              configMapKeyRef:
+                name: drkiq
+                key: listen-on
+          - name: CACHE_URL
+            valueFrom:
+              configMapKeyRef:
+                name: drkiq
+                key: redis-url
+          - name: JOB_WORKER_URL
+            valueFrom:
+              configMapKeyRef:
+                name: drkiq
+                key: redis-url
+          - name: SECRET_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: secret-token
+                key: token
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: database-url
+                key: url
